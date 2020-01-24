@@ -31,11 +31,5 @@ test('Check images', async t => {
 });
 
 
-/*
-test.only(('Scroll page up and down' , async t => {
 
-    await t
-        .
-
-}); */
 

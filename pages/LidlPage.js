@@ -16,17 +16,12 @@ class LidlPage extends BasePage {
         this.SubsBut = Selector('#button-subscribe');
         this.messSuccess = Selector('.message.success');
         this.image = Selector('img.data-image src');
-        //Selector('a').withText('Tienda');
-        //this.productNavigationCategories = Selector('ul').find('.product-navigation.second-level.not-mobile');
-        //this.totalPreu = Selector('tr.order-total').find('.woocommerce-Price-amount.amount');
-        //this.botoQuantitat = Selector('input[type="number"]');
-        //Selector('ul').nth(5);
+
     }
 
     //Entrar a tots els apartats de compra online
     async OnlineShoppingNavigation() {
-        //return t
-        //.click(this.productNavigationCategories.child(2)); //.nth(2)
+
             for(let i=0; i<await this.productNavigationCategories.childElementCount;i++){//productNavigationCategories.length
                 await t
                 .click(this.productNavigationCategories.child(i))//.find('a'))
