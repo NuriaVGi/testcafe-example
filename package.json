@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "testcafe": "./node_modules/.bin/testcafe",
-    "test": "npm run testcafe chrome tests/",
+    "test": "npm run testcafe -- -e chrome tests/",
     "all": "npm run testcafe -- -c 2 chrome:headless,firefox:headless tests/",
     "cli": "npm run testcafe -- -c 2 chrome:headless tests/",
     "safari": "npm run testcafe safari tests/",
@@ -21,7 +21,6 @@
   "dependencies": {
     "minimist": "^1.2.0",
     "node-fetch": "^2.6.0",
-    "testcafe": "^1.2.1",
-    "testcafe-browser-provider-browserstack": "^1.8.0"
+    "testcafe": "^1.6.0"
   }
 }
