@@ -1,4 +1,4 @@
-import { Selector, t } from 'testcafe';
+import { Selector, t, ClientFunction } from 'testcafe';
 import BasePage from './basePage';
 import minimist from "minimist";
 
@@ -23,16 +23,19 @@ class LidlPage extends BasePage {
         this.paragr = Selector('p');
         this.firstChildElement = this.paragr.child(0);
         this.logoLidl = Selector('img[src="/imgs/llogo.png"]');
+        this.h3List = Selector('#content h3');
+        this.lastItem = Selector('.widestcontent:last-child');
+
     }
 
     //Entrar a tots els apartats de compra online
     async onlineShoppingNavigation() {
 
-            for(let i=0; i<await this.productNavigationCategories.childElementCount;i++){//productNavigationCategories.length
-                await t
+        for (let i = 0; i < await this.productNavigationCategories.childElementCount; i++) {//productNavigationCategories.length
+            await t
                 .click(this.productNavigationCategories.child(i))//.find('a'))
                 .navigateTo(`https://www.lidlonline.es/`);
-            }
+        }
 
     }
 
@@ -50,7 +53,7 @@ class LidlPage extends BasePage {
             .click(this.acceptTerms)
             .click(this.SubsBut)
             .expect(this.messSuccess.textContent).contains('Muchas gracias por tu suscripción. En breve recibirás un correo electrónico que te permitirá confirmar y finalizar tu suscripción. De esta forma protegemos tus datos personales de un uso indebido por parte de terceros. En el caso de que no hayas recibido ningún correo electrónico, mira también en la carpeta de correo no deseado de tu buzón, es posible que tu confirmación se haya guardado en esta carpeta.');
-     }
+    }
 
     async checkImages() {
 
@@ -75,6 +78,7 @@ class LidlPage extends BasePage {
 
         }
     }
+
 //Arreglar -->
     async verifyBodyContent() { //test that verifies text content of the body's first child node
 
@@ -90,17 +94,17 @@ class LidlPage extends BasePage {
 
     }
 
-    async screenshotTest2(idType,nameDesc) { //choose screenshot
+    async screenshotTest2(idType, nameDesc) { //choose screenshot
         let screenElem;
-        if(idType === 'id') {
-            await t .navigateTo(`https://empleo.lidl.es/es/index.htm`);
-            screenElem = await Selector('#'+nameDesc);
-        } else if(idType ==='class') {
+        if (idType === 'id') {
             await t.navigateTo(`https://empleo.lidl.es/es/index.htm`);
-            screenElem = await Selector('.'+nameDesc);
+            screenElem = await Selector('#' + nameDesc);
+        } else if (idType === 'class') {
+            await t.navigateTo(`https://empleo.lidl.es/es/index.htm`);
+            screenElem = await Selector('.' + nameDesc);
         } else {
             await t.navigateTo(`https://empleo.lidl.es/es/recursos-humanos.htm`);
-            if(idType === 'p') {
+            if (idType === 'p') {
                 screenElem = await Selector(idType);
             } else {
                 screenElem = await Selector(idType + nameDesc);
@@ -108,9 +112,51 @@ class LidlPage extends BasePage {
         }
         return t.takeElementScreenshot(screenElem);
     }
+
+    async h3Test() {
+        //console.log(await this.h3List.nth(0).innerText);
+        for(let i = 0; i < await this.h3List.count; i++) {
+            console.log(await this.h3List.nth(i).innerText);
+        }
+        await t
+            .expect(await this.h3List.nth(0).innerText).eql('Gerente de Logística Regional')
+            .expect(await this.h3List.nth(1).innerText).eql('Jefe/a de Almacén')
+            .expect(await this.h3List.nth(2).innerText).eql('Jefe/a de Mantenimiento')
+            .expect(await this.h3List.nth(3).innerText).eql('Responsable de Almacén')
+            .expect(await this.h3List.nth(4).innerText).eql('Personal de Almacén');
+            //.print();
+    }
+
+    async jobOffers(pos) { //screenshot logo lidl
+        let studiesButton = Selector('.handler-click.dropdown1');
+        let studiesList = Selector('.dropdown-list');
+
+        await t
+            .click(studiesButton)
+            .click(studiesList.child(pos));
+        const getPageUrl = ClientFunction(() => window.location.href);
+        const offersList = Selector('article');
+
+        console.log(await getPageUrl() + ' url');
+        for(let i = 2; i < await offersList.count; i++){
+        await t.click(offersList.nth(i))
+            .navigateTo(await getPageUrl());
+
+        }
+
+    }
+
+    // async childTest() {
+    //    // return t
+    //      //   .click(this.lastItem)
+    //     await t.click(() => {
+    //         if('p' === true) {
+    //             return this.h3List
+    //         }
+    //         else return this.section;
+    //     });
+    // }
 }
-
-
 export default new LidlPage();
 
 

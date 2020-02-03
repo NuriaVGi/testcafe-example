@@ -43,7 +43,7 @@ test('Screenshot logo Lidl', async t => {
 
 });
 
-test.only('Choose screenshot ', async t => {
+test('Choose screenshot ', async t => {
 
     await LidlPage.screenshotTest2('id','content');
     await LidlPage.screenshotTest2('class','body-inner');
@@ -53,4 +53,24 @@ test.only('Choose screenshot ', async t => {
 });
 
 
+test.page `https://empleo.lidl.es/es/oportunidades-almacen.htm`
+    ('h3 Test', async t => {
+
+    await LidlPage.h3Test();
+
+});
+
+// test.only.page `https://empleo.lidl.es/es/oportunidades-almacen.htm`
+//     ('Child Test', async t => {
+//
+//     await LidlPage.childTest();
+//
+// });
+
+test.only.page `https://empleo.lidl.es/es/busqueda.htm?rdeLocaleAttr=es`
+('Job Offerts Test', async t => {
+
+    await LidlPage.jobOffers(1);
+
+});
 
