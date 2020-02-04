@@ -115,7 +115,7 @@ class LidlPage extends BasePage {
 
     async h3Test() {
         //console.log(await this.h3List.nth(0).innerText);
-        for(let i = 0; i < await this.h3List.count; i++) {
+        for (let i = 0; i < await this.h3List.count; i++) {
             console.log(await this.h3List.nth(i).innerText);
         }
         await t
@@ -124,10 +124,10 @@ class LidlPage extends BasePage {
             .expect(await this.h3List.nth(2).innerText).eql('Jefe/a de Mantenimiento')
             .expect(await this.h3List.nth(3).innerText).eql('Responsable de Almacén')
             .expect(await this.h3List.nth(4).innerText).eql('Personal de Almacén');
-            //.print();
+        //.print();
     }
 
-    async jobOffers(pos) { //screenshot logo lidl
+    async jobOffers(pos) {
         let studiesButton = Selector('.handler-click.dropdown1');
         let studiesList = Selector('.dropdown-list');
 
@@ -138,13 +138,77 @@ class LidlPage extends BasePage {
         const offersList = Selector('article');
 
         console.log(await getPageUrl() + ' url');
-        for(let i = 2; i < await offersList.count; i++){
-        await t.click(offersList.nth(i))
-            .navigateTo(await getPageUrl());
+        for (let i = 2; i < await offersList.count; i++) {
+            await t
+                .click(offersList.nth(i))
+                .navigateTo(await getPageUrl());
 
         }
 
     }
+
+    async nextPrevPageA() {
+
+        let prevNextList = Selector('nav.pagination ul');
+        let count = await prevNextList.childElementCount;
+        let clickNextPage = await Selector('nav.pagination a[rel="next"]');
+        let clickPrevPage = Selector('nav.pagination a[rel="prev"]');
+
+        for (let i = 0; i < count - 1; i++) {
+            await t.click(clickNextPage);
+
+        }
+
+        for (let i = count; i > 1; i--) {
+            await t.click(await clickPrevPage);
+        }
+    }
+
+    async nextPrevPageB() {
+
+        let nextPage = Selector('li.nav').withText('Página siguiente »');//await prevNextList.child(count - 1).textContent;
+        let clickNextPage = Selector('nav.pagination a[rel="next"]');
+        let clickPrevPage = Selector('nav.pagination a[rel="prev"]');
+
+        while (await nextPage.exists) {
+            await t.click(clickNextPage);
+        }
+
+        let prevPage = Selector('li.nav').withText('« Página anterior');
+
+        while (await prevPage.exists) {
+            await t.click(clickPrevPage);
+        }
+    }
+
+    // async menuOptions(recetas) { //
+    //
+    //     let menuArrowButton = Selector('');
+    //     await t.click(menuArrowButton);
+    //     // let menuOption = Selector('span.navigation__text navigation__text--center').withText('Recetas para niños');
+    //     // await t.click(menuOption);
+    //
+    //     switch(recetas) {
+    //         case 'Recetas para niños':
+    //             console.log("Entra receptes nenes");
+    //             break;
+    //         case 'Todas las recetas':
+    //         // code block
+    //             break;
+    //         case 'San Valentín':
+    //         // code block
+    //             break;
+    //         case 'Recetas del mundo':
+    //         // code block
+    //             break;
+    //         default:
+    //             console.log("Looking forward to find an IT job");
+    //             break;
+    //     // code block
+    // }
+    //
+
+// }
 
     // async childTest() {
     //    // return t

@@ -67,10 +67,31 @@ test.page `https://empleo.lidl.es/es/oportunidades-almacen.htm`
 //
 // });
 
-test.only.page `https://empleo.lidl.es/es/busqueda.htm?rdeLocaleAttr=es`
+test.page `https://empleo.lidl.es/es/busqueda.htm?rdeLocaleAttr=es`
 ('Job Offerts Test', async t => {
 
     await LidlPage.jobOffers(1);
+
+});
+
+test.page `https://empleo.lidl.es/es/busqueda.htm?rdeLocaleAttr=es`
+('Next/Prev page Test 1', async t => {
+
+    await LidlPage.nextPrevPageA();
+
+});
+
+test.only.page `https://empleo.lidl.es/es/busqueda.htm?rdeLocaleAttr=es`
+('Next/Prev page Test 2', async t => {
+
+    await LidlPage.nextPrevPageB();
+
+});
+
+test.page `https://recetas.lidl.es/`
+('Switch Recipes', async t => {
+
+    await LidlPage.menuOptions('Recetas para niños');
 
 });
 
