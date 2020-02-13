@@ -25,7 +25,11 @@ class LidlPage extends BasePage {
         this.logoLidl = Selector('img[src="/imgs/llogo.png"]');
         this.h3List = Selector('#content h3');
         this.lastItem = Selector('.widestcontent:last-child');
-
+        this.menuOption ="";
+        this.menuArrowButton = "";
+        this.menuList = Selector('div.navigation__container.navigation__container--strict-oneline li');
+        this.cityEntry = Selector('input#city.form__input');
+        this.findShopButton = Selector('.storesearch__searchbox button[type="submit"]');
     }
 
     //Entrar a tots els apartats de compra online
@@ -79,7 +83,7 @@ class LidlPage extends BasePage {
         }
     }
 
-//Arreglar -->
+
     async verifyBodyContent() { //test that verifies text content of the body's first child node
 
         await t
@@ -181,46 +185,135 @@ class LidlPage extends BasePage {
         }
     }
 
-    // async menuOptions(recetas) { //
-    //
-    //     let menuArrowButton = Selector('');
-    //     await t.click(menuArrowButton);
-    //     // let menuOption = Selector('span.navigation__text navigation__text--center').withText('Recetas para niños');
-    //     // await t.click(menuOption);
-    //
-    //     switch(recetas) {
-    //         case 'Recetas para niños':
-    //             console.log("Entra receptes nenes");
-    //             break;
-    //         case 'Todas las recetas':
-    //         // code block
-    //             break;
-    //         case 'San Valentín':
-    //         // code block
-    //             break;
-    //         case 'Recetas del mundo':
-    //         // code block
-    //             break;
-    //         default:
-    //             console.log("Looking forward to find an IT job");
-    //             break;
-    //     // code block
-    // }
-    //
+    async recipesMenu(recetas) { //
 
-// }
+        this.menuArrowButton = Selector('button[data-controller="slider/next"]').nth(1);
 
-    // async childTest() {
-    //    // return t
-    //      //   .click(this.lastItem)
-    //     await t.click(() => {
-    //         if('p' === true) {
-    //             return this.h3List
-    //         }
-    //         else return this.section;
-    //     });
+        switch (recetas) {
+            case 'Recetas para niños': // Fails to click menuArrowButton
+                await this.clickArrowIfNotVisible('div.navigation__item a[href="/Recetas-para-ninos"]','Recetas para niños');
+                await t
+                    .expect(Selector('section.teaser h2').nth(0).innerText).eql('Recetas a partir de 6 meses')
+                    .expect(Selector('section.teaser h2').nth(1).innerText).eql('Recetas a partir de 12 meses')
+                    .expect(Selector('section.teaser h2').nth(2).innerText).eql('Recetas a partir de 2 años')
+                    .expect(Selector('section.teaser h2').nth(3).innerText).eql('Recetas a partir de 3 años');
+
+                break;
+            case 'Todas las recetas':
+                await this.clickArrowIfNotVisible('div.navigation__item a[href="/Todas-las-recetas"]','Todas las recetas');
+                let recipesList;
+                let i = 0;
+
+                while(Selector('a').withText('Ver más').exists) {
+                    recipesList = Selector('div .container.content.view-content.themeworld--content a.teaser-link.ng-scope');
+                    // console.log('recipes count ' + await recipesList.count);
+                    // console.log('i count ' + i);
+                    // console.log('-----');
+                    for (i; i<await recipesList.count;i++) {
+                        await t
+                            .click(recipesList.nth(i))
+                            .expect(Selector('div .video-container').exists).ok()//image section -video
+                            .expect(Selector('section.instructions').exists).ok()// instructions section
+                            .expect(Selector('section#ingredients_display').exists).ok() // ingredients section
+                            .expect(Selector('div.facts').exists).ok()// nutrients section
+                            .navigateTo(`https://recetas.lidl.es/Todas-las-recetas`);
+                    }
+                    await t.click(Selector('a').withText('Ver más'));
+                }
+                break;
+            case 'San Valentín':
+                await this.clickArrowIfNotVisible('div.navigation__item a[href="/Recetas-de-San-Valentin-originales"]','San Valentín');
+                break;
+            case 'Recetas del mundo':
+                await this.clickArrowIfNotVisible('div.navigation__item a[href="/Recetas-del-mundo"]','Recetas del mundo');
+                break;
+            default:
+                console.log("Incorrect option");
+                break;
+            // code block
+        }
+    }
+        // ********** recipesMenu() Switch Functions **************
+
+        async clickArrowIfNotVisible(selector, title) { //'div.navigation__item a[href="/Recetas-del-mundo"]'
+            this.menuOption = Selector(selector);
+            let menuList = Selector('div.slick-track span');
+            let pos;
+            for(let i=0; i<await menuList.count; i++) {
+                if(title === await menuList.nth(i).innerText) {
+                    pos = i;
+                }
+            }
+            if(pos>5) {
+                await t.click(this.menuArrowButton);
+            }
+            await t.click( this.menuOption);
+            // if(!(await this.menuOption.visible)) {
+            //     await t.click(this.menuArrowButton);
+            // }
+            // await t.click(this.menuOption);
+        }
+
+
+    //      checkRecipiesSections() {
+    //
+    //
     // }
-}
-export default new LidlPage();
+
+    // *************************Navigation User Menu ****************************************
+
+    async navigationUserMenu() { // Navigate Right Top Menu
+        // console.log('Items num ' + await this.menuList.count);
+        // console.log('Titles: ' +await this.menuList.nth(0).innerText + ', '+ await menuList.nth(1).innerText + ', ' + await menuList.nth(2).innerText + ', ' + await menuList.nth(3).innerText);
+        await this.shopSearcher();
+        await this.pamphlet();
+        await this.newsletter();
+        await this.socialNetworks();
+    }
+
+    async shopSearcher() {
+
+        await t
+            .click(this.menuList.nth(0))
+            .typeText(this.cityEntry, 'Sant Cugat del Valles')
+            .click(await this.findShopButton);
+    }
+
+    async pamphlet() {
+
+        await t
+            .click(this.menuList.nth(1))
+            .click(Selector('h2.hint__title').withText('Selecciona tu región para ver tus productos'))
+            .typeText(this.cityEntry, 'Sant Cugat del Valles')
+            .click(this.findShopButton);
+    }
+
+    async newsletter() {
+
+        await t.click(this.menuList.nth(2));
+    }
+
+    async socialNetworks() {
+
+        await t.click(this.menuList.nth(3));
+    }
+
+
+    // *******************************************************************************
+
+
+       // async childTest() {
+        //    // return t
+        //      //   .click(this.lastItem)
+        //     await t.click(() => {
+        //         if('p' === true) {
+        //             return this.h3List
+        //         }
+        //         else return this.section;
+        //     });
+        // }
+    }
+        export default new LidlPage();
+
 
 

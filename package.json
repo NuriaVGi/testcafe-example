@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "testcafe": "./node_modules/.bin/testcafe",
-    "test": "npm run testcafe -- -e chrome tests/",
+    "test": "npm run testcafe  -- -e -L chrome tests/",
     "all": "npm run testcafe -- -c 2 chrome:headless,firefox:headless tests/",
     "cli": "npm run testcafe -- -c 2 chrome:headless tests/",
     "safari": "npm run testcafe safari tests/",
