@@ -81,17 +81,23 @@ test.page `https://empleo.lidl.es/es/busqueda.htm?rdeLocaleAttr=es`
 
 });
 
-test.only.page `https://empleo.lidl.es/es/busqueda.htm?rdeLocaleAttr=es`
+test.page `https://empleo.lidl.es/es/busqueda.htm?rdeLocaleAttr=es`
 ('Next/Prev page Test 2', async t => {
 
     await LidlPage.nextPrevPageB();
 
 });
 
-test.page `https://recetas.lidl.es/`
+test.page `https://recetas.lidl.es/` // ****** Not finished ********
 ('Switch Recipes', async t => {
 
-    await LidlPage.menuOptions('Recetas para niños');
+    await LidlPage.recipesMenu('San Valentín');
 
 });
 
+test.only.page `https://www.lidl.es/es/index.htm`
+    ('Navigate User Menu', async t => {
+
+        await LidlPage.navigationUserMenu();
+
+    });
