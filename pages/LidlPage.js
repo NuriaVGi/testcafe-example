@@ -355,7 +355,7 @@ class LidlPage extends BasePage {
             .typeText(await nameBox, 'Núria')
             .typeText(surnamesBox, 'Viñas Gilabert')
             .typeText(PC, '08198')
-            .typeText(mail, 'nvg33.warp@gmail.com')
+            .typeText(mail, 'nvg33@gmail.com')
             .click(birthDateLabel.nth(5))
             .click(birthYearButton)
             .click(birthYearDropMenu.withText('1983'))
@@ -372,8 +372,10 @@ class LidlPage extends BasePage {
     }
 
     async socialNetworks() {
-        let cookiesButton = Selector('button[type="submit"]').withText('X');
-        let menuTitle = Selector('span.navigation__text.navigation__text--center').withText('Redes sociales');
+        console.log('Entra');
+        await t.navigateTo(`https://www.lidl.es/es/index.htm`);
+        let cookiesButton = await Selector('button[type="submit"]').withText('X');
+        let menuTitle = await Selector('span.navigation__text.navigation__text--center').withText('Redes sociales');
         await t
             .click(cookiesButton)
             .hover(menuTitle);
