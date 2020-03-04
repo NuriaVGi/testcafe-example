@@ -30,6 +30,9 @@ class LidlPage extends BasePage {
         this.menuList = Selector('div.navigation__container.navigation__container--strict-oneline li');
         this.cityEntry = Selector('input#city.form__input');
         this.findShopButton = Selector('.storesearch__searchbox button[type="submit"]');
+        const scroll = ClientFunction(function() {
+            window.scrollBy(0,500)
+        });
     }
 
     //Entrar a tots els apartats de compra online
@@ -260,14 +263,14 @@ class LidlPage extends BasePage {
     //
     // }
 
-    // *************************Navigation User Menu ****************************************
+    // *************************NAVIGATION USER MENU ****************************************
 
     async navigationUserMenu() { // Navigate Right Top Menu
         // console.log('Items num ' + await this.menuList.count);
         // console.log('Titles: ' +await this.menuList.nth(0).innerText + ', '+ await menuList.nth(1).innerText + ', ' + await menuList.nth(2).innerText + ', ' + await menuList.nth(3).innerText);
         await this.shopSearcher();
         await this.pamphlet();
-        await this.newsletter();
+        await this.newsletter(); // switch iframe
         await this.socialNetworks();
     }
 
@@ -280,26 +283,118 @@ class LidlPage extends BasePage {
     }
 
     async pamphlet() {
-
+        let onlineButton = Selector('div.leafletcontainer__browse-text').withText('Ver online');
+        let nextPageButton = await Selector('button[type="button"][aria-label="Página siguiente"]');
+        let prevPageButton = await Selector('button[type="button"][aria-label="Página previa"]');
+        let numbPages;
+        let lastPage;
+        let downloadPDF;
         await t
             .click(this.menuList.nth(1))
             .click(Selector('h2.hint__title').withText('Selecciona tu región para ver tus productos'))
             .typeText(this.cityEntry, 'Sant Cugat del Valles')
-            .click(this.findShopButton);
+            .click(this.findShopButton)
+            // check if exists list of shops and map
+            .expect(Selector('div.storesearch__filterandresultwrapper ul').exists).ok()
+            .expect(Selector('div.MicrosoftMap').exists).ok()
+            .navigateTo(`https://www.lidl.es/es/folleto-online.htm`)
+            //navigate to healthy recipes pamphlet
+            .click(onlineButton.nth(0));
+        numbPages = await Selector('button.stepper').textContent;
+        lastPage = numbPages.split(" ");
+        let count = lastPage[2];
+        for(let i=0; i<count; i++) { // !!!!!!!!!!!!!!!!!!!!!!!!!!!
+            await t.click(nextPageButton);
+        }
+        for(let i=count; i>0; i--) { //!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            await t.click(prevPageButton);
+        }
+        //Download PDF
+        await t.navigateTo(`https://www.lidl.es/es/folleto-online.htm`);
+        downloadPDF = await Selector('span.download__text');
+        await t.click(downloadPDF);
     }
 
-    async newsletter() {
+    async newsletter() { // ********** switchToIframe *********************
+        const getLocation = ClientFunction(() => window.location.href);
+        console.log(await getLocation());
 
-        await t.click(this.menuList.nth(2));
+        let textIntro;
+        await t
+            .navigateTo(`https://www.lidl.es/es/index.htm`)
+            .click(this.menuList.nth(2));
+        //Check if text introduction is ok
+        textIntro = Selector('div.textbody.textbody--padding-horizontal.textbody--links-brand-primary p');
+        await t
+            .expect(textIntro.nth(0).textContent).eql('Regístrate y no dejes pasar ninguna oferta.')
+            .expect(textIntro.nth(1).textContent).eql('Descubre en el newsletter de Lidl ofertas semanales, campañas de productos rebajados, sorteos, recetas y mucho más. Solo tienes que suscribirte con tu dirección de correo electrónico. Si deseas recibir información más personalizada, indica también tu nombre y apellido.');
+        //  .switchToMainWindow()
+        //Sign
+        let genderButton = await Selector('#xi-sel-1_1');
+        let nameBox = await Selector('#xi-tf-1');
+        let surnamesBox = await Selector('#xi-tf-6');
+        let PC = await Selector('#xi-tf-7');
+        let mail = await Selector('#xi-tf-3');
+        let birthDateLabel = await Selector('label.label-top');
+        let monthNextButton = await Selector('span.ui-icon.ui-icon-circle-triangle-e').withText('Sig');
+        let birthYearButton = await Selector('select.ui-datepicker-year');
+        let birthYearDropMenu = birthYearButton.find('option'); // drop-down list
+        let birthDay = await Selector('a.ui-state-default');
+        let childNumber = Selector('#xi-sel-2_2');
+        let interests = Selector('label.label-icon-checkbox');
+        let gdpr = await Selector('label.label-right.required');
+        let sendButton = await Selector('#xi-btn-1_btn0');
+        let message = await Selector('div.alert.alert-success.mt-1');
+        let okMessage = 'El alta se ha realizado correctamente. En breve recibirás un correo electrónico que te permitirá confirmar y finalizar tu suscripción. De esta forma protegemos tus datos personales de un uso indebido por parte de terceros. En el caso de que no hayas recibido ningún correo electrónico, mira también en la carpeta de correo no deseado de tu buzón, es posible que tu confirmación se haya guardado en esta carpeta.';
+        await t.wait(3000);
+        await t
+            .switchToIframe('#iframe-4967');
+            console.log(await getLocation());
+            await t
+            .click(genderButton)
+            .typeText(await nameBox, 'Núria')
+            .typeText(surnamesBox, 'Viñas Gilabert')
+            .typeText(PC, '08198')
+            .typeText(mail, 'nvg33.warp@gmail.com')
+            .click(birthDateLabel.nth(5))
+            .click(birthYearButton)
+            .click(birthYearDropMenu.withText('1983'))
+            .click(monthNextButton)
+            .click(birthDay.nth(2))
+            // .debug()
+            .click(childNumber)
+            .click(interests.nth(5))
+            .click(interests.nth(16))
+            .click(gdpr)
+            .click(sendButton)
+            .expect(message.innerText).contains(okMessage);
+
     }
 
     async socialNetworks() {
+        let cookiesButton = Selector('button[type="submit"]').withText('X');
+        let menuTitle = Selector('span.navigation__text.navigation__text--center').withText('Redes sociales');
+        await t
+            .click(cookiesButton)
+            .hover(menuTitle);
+        let list = await Selector('div.flyout.flyout--socialmedia ul');
+        let socialNetworksList = await list.nth(0);
+        for(let i=0; i<await socialNetworksList.childElementCount; i++) {
+           await t
+                .click(socialNetworksList.child(i))
+                .navigateTo(`https://www.lidl.es/es/folleto-online.htm#`)
+                .click(cookiesButton)
+                .hover(menuTitle);
+        }
 
-        await t.click(this.menuList.nth(3));
-    }
+
+        // *******************************************************************************
+    // ********************** MASTHEAD NAVIGATION MENU *******************************
 
 
-    // *******************************************************************************
+
+
+        // ***************************************************************************
 
 
        // async childTest() {
@@ -313,6 +408,7 @@ class LidlPage extends BasePage {
         //     });
         // }
     }
+}
         export default new LidlPage();
 
 
